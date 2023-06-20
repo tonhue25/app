@@ -1,0 +1,11 @@
+{
+    "URL": {
+        "SERVER_URL": "http://192.168.8.37:9013/pdfsignature",
+        "GetProfileDetailModels": "GetProfileDetailModels",
+        "Login": "Login",
+        "SaveFile": "SaveFile",
+        "GetProfileModels": "GetProfileModels",
+        "GetFileContent": "GetFileContent",
+        "CheckExistFilename": "CheckExistFilename"
+    }
+}
