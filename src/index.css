@@ -30,3 +30,7 @@ body,
     text-decoration: none;
     color: white;
 }
+
+.react-datepicker-wrapper {
+    width: 100%;
+}

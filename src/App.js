@@ -12,6 +12,7 @@ function App() {
     if (!access || access == null) {
         return <Login setAccess={setAccess} />;
     }
+
     return (
         <Routes>
             <Route path={'/'}>

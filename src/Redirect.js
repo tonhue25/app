@@ -1,4 +1,4 @@
 const Redirect = (page) => {
-    window.location = `${window.location.href + page}`;
+    window.location = `${window.location.origin + '/' + page}`;
 };
 export default Redirect;

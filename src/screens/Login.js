@@ -47,7 +47,9 @@ function Login() {
                     <br />
                     <br />
                     <br />
-                    <h3 className="text-uppercase text-center">ỨNG DỤNG XÁC THỰC CHỮ KÝ SỐ</h3>
+                    <h3 className="text-uppercase text-center">
+                        Ứng dụng kiểm tra xác minh chữ ký số trên văn bản điện tử
+                    </h3>
                     <br />
                     <div style={{ maxWidth: '60%', justifyContent: 'center' }} className="mx-auto">
                         <form method="post" action="/User/Login">

@@ -1,5 +1,5 @@
 import Moment from 'moment';
-function SignatureDetail({ data, index }) {
+function SignatureDetail({ data, index, values, array }) {
     return (
         <>
             {data ? (
@@ -26,15 +26,28 @@ function SignatureDetail({ data, index }) {
                                         </div>
                                         <div className="row">
                                             <ul className="nav flex-column">
-                                                {data.errMsgs ? (
-                                                    // data.errMsgs.map((item) => (
-                                                    //     <li>
-                                                    //         <span className="nav-link">{item}</span>
-                                                    //     </li>
-                                                    // ))
-                                                    <li></li>
+                                                {array ? (
+                                                    array.map((item) => (
+                                                        <li>
+                                                            <span className="nav-link" style={{ color: 'red' }}>
+                                                                {item}
+                                                            </span>
+                                                        </li>
+                                                    ))
                                                 ) : (
-                                                    <></>
+                                                    <>
+                                                        {values ? (
+                                                            values.map((item) => (
+                                                                <li>
+                                                                    <span className="nav-link" style={{ color: 'red' }}>
+                                                                        {item}
+                                                                    </span>
+                                                                </li>
+                                                            ))
+                                                        ) : (
+                                                            <></>
+                                                        )}
+                                                    </>
                                                 )}
                                             </ul>
                                         </div>

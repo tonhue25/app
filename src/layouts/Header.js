@@ -4,19 +4,20 @@ function Header() {
     const handleLogout = () => {
         sessionStorage.removeItem(account);
     };
+
     return (
         <header style={{ backgroundColor: '#1967b9' }}>
             <nav className="navbar navbar-expand-sm navbar-toggleable-sm bg-primary border-bottom box-shadow mb-3 p-3">
                 <div className="container-fluid" style={{ display: 'flex', maxWidth: '80%' }}>
                     <div className="navbar-header">
                         <span style={{ color: 'white', textDecoration: 'none' }}>
-                            SGB - Xác thực chữ ký số hợp đồng điện tử
+                            Ứng dụng kiểm tra xác minh chữ ký số trên văn bản điện tử
                         </span>
                         <Link to={verification} className="ml-5 text-color text-size">
-                            Xác thực
+                            Kiểm tra chữ ký số
                         </Link>
                         <Link to={home} className="ml-5 text-color text-size">
-                            Danh sách PDF
+                            Danh sách File
                         </Link>
                     </div>
                     <div className="navbar-header " style={{ justifyContent: 'flex-end', display: 'block' }}>

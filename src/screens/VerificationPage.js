@@ -55,7 +55,7 @@ function VerificationPage() {
             var type = e.target.files[0].name.split('.').pop();
             if ((type.toUpperCase() !== 'PDF') & (type.toUpperCase() !== 'DOCX') & (type.toUpperCase() !== 'DOC')) {
                 Swal.fire({
-                    title: 'Đinh dạng file là pdf !',
+                    title: 'Đinh dạng file là .pdf/.docx !',
                 });
                 document.getElementById('file-upload').value = '';
                 setFile(null);
@@ -71,7 +71,7 @@ function VerificationPage() {
         var url = URL.createObjectURL(file);
         document.getElementById(
             'iframeDisplayFile',
-        ).innerHTML = `<iframe src=${url} style="border:2px solid red; width:100%; height:100%"></iframe>`;
+        ).innerHTML = `<iframe src=${url} style="border:2px solid; width:100%; height:100%"></iframe>`;
     };
 
     const handleDelete = () => {
@@ -79,6 +79,8 @@ function VerificationPage() {
         setFile(null);
         setTitle('');
     };
+
+    const [isClickButton, setIsClickButton] = useState(false);
 
     function uploadFile(isSave) {
         CheckExistFile();
@@ -97,14 +99,37 @@ function VerificationPage() {
         formData.append('isSave', isSave);
         formData.append('file', file);
         formData.append('title', title);
-        const config = {
-            headers: {
-                'content-type': 'multipart/form-data',
-            },
-        };
-        axios
-            .post(url, formData, config)
+
+        const API = axios.create({
+            baseURL: configData.URL.SERVER_URL,
+        });
+
+        API.interceptors.request.use((req) => {
+            Swal.fire({
+                title: 'Đang xử lí',
+                allowEscapeKey: false,
+                allowOutsideClick: false,
+                showConfirmButton: false,
+                timer: 20000,
+                didOpen: () => {
+                    Swal.showLoading();
+                },
+            }).then(function (result) {
+                if (result.dismiss === Swal.DismissReason.timer) {
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Timeout',
+                        timer: 2000,
+                    }).then((result) => {});
+                }
+            });
+            return req;
+        });
+
+        API.post(url, formData)
             .then((response) => {
+                Swal.close();
+                setIsClickButton(false);
                 setSignatures(response.data);
                 if (response.data.length > 0) {
                     setSelected(response.data[0]);
@@ -119,7 +144,6 @@ function VerificationPage() {
                 }
             })
             .catch((error) => {
-                console.log(error);
                 Swal.fire('Upload file thất bại!');
                 handleDelete();
             });
@@ -162,59 +186,60 @@ function VerificationPage() {
         <>
             <div className="container mt-5 pb-5">
                 <div className="card card-body mt-5 border-dark">
-                    <div className="form-group">
-                        <label className="col-form-label ms-3 mb-3">Chọn file PDF cần kiểm tra xác thực chữ ký:</label>
-                        <input
-                            id="file-upload"
-                            className="form-control mb-3"
-                            type="file"
-                            accept=".pdf, .doc, .docx"
-                            asp-for="UploadedFile"
-                            data-bs-value="Trống"
-                            onChange={onSelectFile}
-                        />
-                        {file && isDisplayView ? (
-                            <button
-                                type="button"
-                                className="btn btn-primary"
-                                data-toggle="modal"
-                                data-target="#exampleModalFile"
-                                onClick={displayIframe}
-                            >
-                                Xem file
-                            </button>
-                        ) : (
-                            <></>
-                        )}
+                    <div className="row ">
+                        <div className="col-11">
+                            <label className="col-form-label ms-3 mb-2">
+                                Chọn file PDF/DOCX cần kiểm tra xác thực chữ ký:
+                            </label>
+                            <input
+                                id="file-upload"
+                                className="form-control mb-3"
+                                type="file"
+                                accept=".pdf, .doc, .docx"
+                                asp-for="UploadedFile"
+                                data-bs-value="Trống"
+                                onChange={onSelectFile}
+                            />
+                        </div>
+                        <div className="col-1" style={{ marginLeft: '-15px', marginTop: '46px' }}>
+                            <div className="row justify-content-center">
+                                {file && isDisplayView ? (
+                                    <button
+                                        type="button"
+                                        className="btn btn-primary"
+                                        data-toggle="modal"
+                                        data-target="#exampleModalFile"
+                                        onClick={displayIframe}
+                                    >
+                                        Xem file
+                                    </button>
+                                ) : (
+                                    <></>
+                                )}
+                            </div>
+                        </div>
                     </div>
                     <div className="form-group">
                         <label className="control-label col-sm-2" htmlFor="title">
                             Tiêu đề/Nội dung:
                         </label>
-                        <div className="col-sm-12">
-                            <textarea
-                                id="title"
-                                className="form-control"
-                                name="title"
-                                onChange={(e) => setTitle(e.target.value)}
-                                value={title || ''}
-                            />
-                        </div>
+                        <textarea
+                            id="title"
+                            className="form-control"
+                            name="title"
+                            onChange={(e) => setTitle(e.target.value)}
+                            value={title || ''}
+                        />
                     </div>
-
                     <div className="row justify-content-center">
-                        <div className="col-md-4 d-grid">
-                            <>
-                                <button
-                                    className="btn btn-primary"
-                                    type="submit"
-                                    value="Upload file"
-                                    onClick={(e) => handleSubmit(e, false)}
-                                >
-                                    KIỂM TRA XÁC THỰC CHỮ KÝ
-                                </button>
-                            </>
-                        </div>
+                        <button
+                            className="btn btn-primary"
+                            type="submit"
+                            value="Upload file"
+                            onClick={(e) => handleSubmit(e, false)}
+                        >
+                            KIỂM TRA XÁC THỰC CHỮ KÝ
+                        </button>
                     </div>
                 </div>
                 <div id="signatures_id">
@@ -227,18 +252,19 @@ function VerificationPage() {
                                 filename={file ? file.name : ''}
                                 isValid={isValid}
                                 selected={selected}
+                                array={selected.errMsgs ? selected.errMsgs : []}
                             />
                             {isDisplaySave ? (
                                 <>
                                     <div className="row justify-content-center mt-4">
-                                        <div className="col-md-4 d-grid">
+                                        <div>
                                             <button
                                                 className="btn btn-primary"
                                                 type="submit"
                                                 value="Upload file"
                                                 onClick={(e) => handleSubmit(e, true)}
                                             >
-                                                Lưu file và thông tin xác thực
+                                                LƯU FILE VÀ THÔNG TIN XÁC THỰC
                                             </button>
                                         </div>
                                     </div>

@@ -1,7 +1,19 @@
 import SignatureDetail from './SignatureDetail';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUserXmark, faUserCheck } from '@fortawesome/free-solid-svg-icons';
-function Modal({ signatures, handleDisplay, index, filename, isValid, selected }) {
+import { useEffect, useState } from 'react';
+function Modal({ signatures, handleDisplay, index, filename, isValid, selected, errorMessa, array }) {
+    const [values, setValues] = useState([]);
+    useEffect(() => {
+        if (errorMessa) {
+            console.log(errorMessa.toString());
+            let del_str = errorMessa.toString().replace('["', '');
+            del_str = del_str.replace('"]', '');
+            var arr = del_str.split('","');
+            setValues(arr);
+        }
+    }, [selected, errorMessa]);
+
     return (
         <div className="container mt-5">
             <p className="mb-3"> File : {filename}</p>
@@ -11,7 +23,9 @@ function Modal({ signatures, handleDisplay, index, filename, isValid, selected }
                 {isValid ? (
                     <span style={{ color: 'green' }}> CHỮ KÝ HỢP LỆ</span>
                 ) : (
-                    <span style={{ color: 'red' }}> CHỮ KÝ KHÔNG HỢP LỆ</span>
+                    <>
+                        <span style={{ color: 'red' }}> CHỮ KÝ KHÔNG HỢP LỆ</span>
+                    </>
                 )}
             </p>
             <p className="mb-3">Danh sách chữ ký số:</p>
@@ -56,7 +70,7 @@ function Modal({ signatures, handleDisplay, index, filename, isValid, selected }
                     </ul>
                 </div>
                 <div className="card-body tab-content">
-                    <SignatureDetail data={selected} index={index} />
+                    <SignatureDetail data={selected} index={index} values={values} array={array} />
                 </div>
             </div>
         </div>

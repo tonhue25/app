@@ -3,7 +3,8 @@ import * as service from '../services/service';
 import SignatureItem from '../components/SignatureItem';
 import Paging from '../components/Paging';
 import Modal from '../components/Modal';
-import Moment from 'moment';
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
 
 function Home() {
     const [index, setIndex] = useState(0);
@@ -38,6 +39,7 @@ function Home() {
             const GetProfileDetailModels = async () => {
                 const result = await service.GetProfileDetailModels(selectedRecord.id);
                 setSelectedSignature(result.data);
+                console.log(result.data);
                 if (result.data.length > 0) {
                     setSelectedItem(result.data[0]);
                     setIndex(0);
@@ -57,7 +59,7 @@ function Home() {
                 data.fileName.trim(),
                 data.signerName.trim(),
                 JSON.parse(sessionStorage.getItem('account')).userId,
-                data.verificationDate.trim(),
+                date,
             );
             setProfiles(result.data);
         };
@@ -67,12 +69,13 @@ function Home() {
     const handleSubmit = (e) => {
         setPage(1);
         e.preventDefault();
+        data.verificationDate = date;
         const GetProfileModels = async () => {
             const result = await service.GetProfileModels(
                 data.fileName.trim(),
                 data.signerName.trim(),
                 JSON.parse(sessionStorage.getItem('account')).userId.trim(),
-                data.verificationDate.trim(),
+                date,
             );
             setProfiles(result.data);
         };
@@ -83,6 +86,48 @@ function Home() {
         setSelectedItem(data);
         setIndex(i);
     };
+
+    const [dateObj, setDateObj] = useState();
+    const [date, setDate] = useState();
+    const handleDate = (dt) => {
+        setDateObj(dt);
+        let normalFormate = dt === null ? '' : normalDateFormate(dt);
+        setDate(normalFormate);
+    };
+
+    const normalDateFormate = (d) => {
+        if (d) {
+            return (
+                ('0' + d.getDate()).slice(-2) +
+                '/' +
+                ('0' + (Number(d.getMonth()) + 1)).slice(-2) +
+                '/' +
+                d.getFullYear()
+            );
+        }
+        return d;
+    };
+
+    const [errorMessa, setErrorMessa] = useState([]);
+    useEffect(() => {
+        if (selectedItem) {
+            console.log(selectedItem.errMsgs.toString());
+            let del_str = selectedItem.errMsgs.toString().replace('["', '');
+            del_str = del_str.replace('"]', '');
+            setErrorMessa(del_str.split('","'));
+            console.log(errorMessa);
+        }
+    }, [selectedItem]);
+
+    // const convertTo = (selected) => {
+    //     if (selected.errMsgs) {
+    //         console.log(selected.errMsgs.toString());
+    //         let del_str = selected.errMsgs.toString().replace('["', '');
+    //         del_str = del_str.replace('"]', '');
+    //         setErrorMessa(del_str.split('","'));
+    //     }
+    //     return errorMessa;
+    // };
 
     return (
         <div b-sc2ybqgu5x="" className="wrapper">
@@ -98,16 +143,6 @@ function Home() {
                                     <div className="card card-primary">
                                         <div className="card-header">
                                             <h3 className="card-title">Tìm kiếm</h3>
-                                            <div className="card-tools">
-                                                <button
-                                                    type="button"
-                                                    className="btn btn-tool"
-                                                    data-card-widget="collapse"
-                                                    title="Collapse"
-                                                >
-                                                    <i className="fas fa-minus" />
-                                                </button>
-                                            </div>
                                         </div>
                                         <div className="card-body">
                                             <div className="row">
@@ -153,14 +188,26 @@ function Home() {
                                                             <label htmlFor="SearchModel_GuarNo">Ngày xác thực</label>
                                                         </div>
                                                         <div className="col-7">
-                                                            <input
-                                                                type="text"
+                                                            {/* <div className="form-group mb-4">
+                                                                <div
+                                                                    className="datepicker date input-group"
+                                                                    id="datepicker"
+                                                                > */}
+                                                            <div></div>
+                                                            <DatePicker
+                                                                selected={dateObj}
+                                                                dateFormat="dd/MM/yyyy"
+                                                                onChange={handleDate}
                                                                 className="form-control"
-                                                                id="verificationDate"
-                                                                name="verificationDate"
-                                                                onChange={onChange}
-                                                                value={data.verificationDate || ''}
+                                                                style={{ width: '100%' }}
                                                             />
+                                                            {/* <div className="input-group-append">
+                                                                        <span className="input-group-text">
+                                                                            <i className="fa fa-calendar" />
+                                                                        </span>
+                                                                    </div>
+                                                                </div>
+                                                            </div> */}
                                                         </div>
                                                     </div>
                                                 </div>
@@ -170,15 +217,6 @@ function Home() {
                                             <button type="submit" className="btn btn-primary" onClick={handleSubmit}>
                                                 Lọc dữ liệu
                                             </button>
-                                            {/* <button
-                                                type="submit"
-                                                className="btn btn-info"
-                                                name="Action"
-                                                id="Action"
-                                                value="CLEAR"
-                                            >
-                                                Xóa bộ lọc
-                                            </button> */}
                                         </div>
                                     </div>
                                 </form>
@@ -207,10 +245,7 @@ function Home() {
                                                     <SignatureItem
                                                         key={index}
                                                         item={item}
-                                                        onClick={
-                                                            // () => setSelectedId(item.id)
-                                                            () => setSelectedRecord(item)
-                                                        }
+                                                        onClick={() => setSelectedRecord(item)}
                                                     />
                                                 ))}
                                             </>
@@ -245,6 +280,7 @@ function Home() {
                                                 )}
                                                 isValid={selectedRecord.isValid}
                                                 selected={selectedItem}
+                                                errorMessa={selectedItem.errMsgs ? selectedItem.errMsgs : []}
                                             />
                                         ) : (
                                             <></>
